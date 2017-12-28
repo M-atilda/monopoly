@@ -4,8 +4,10 @@ defmodule Monopoly.Mixfile do
   def project do
     [
       app: :monopoly,
+      escript: escript_config,
       version: "0.1.0",
       elixir: "~> 1.5",
+      build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       deps: deps()
     ]
@@ -25,4 +27,9 @@ defmodule Monopoly.Mixfile do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
     ]
   end
+
+  defp escript_config do
+    [ main_module: Monopoly ]
+  end
+
 end

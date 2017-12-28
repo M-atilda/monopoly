@@ -1,8 +1,11 @@
 defmodule Monopoly do
   import Monopoly.Util
 
-
-  def main() do
+  def main([name]) do
+    Node.start String.to_atom(name)
+    main_setup
+  end
+  def main_setup do
     {player_name, players_name_list} = start_helper
     IO.puts "let's monopoly."
     input_server = Monopoly.Input.generate_input_server(self)
@@ -22,17 +25,19 @@ defmodule Monopoly do
         main_rooter(player_name, players_name_list, input_server, moderator)
 
       {:next, new_players_name_list, _client} ->
+        Process.exit(input_server, :kill)
+        :timer.sleep 500
         send moderator, {:new_turn, new_players_name_list, self}
         [h|_] = new_players_name_list
         if h == player_name do
           IO.puts "[Game] your turn."
           new_input_server = Monopoly.Input.generate_input_server(self, true)
           send moderator, {:my_turn, new_input_server, self}
-          Process.exit(input_server, :kill)
           main_rooter(player_name, new_players_name_list, new_input_server, moderator)
         else
           IO.puts "[Game] #{h}'s turn."
-          main_rooter(player_name, new_players_name_list, input_server, moderator)
+          new_input_server = Monopoly.Input.generate_input_server(self)
+          main_rooter(player_name, new_players_name_list, new_input_server, moderator)
         end
 
       #NOTE: treat trade at top layer because it needs to make new input server
@@ -128,6 +133,7 @@ please select >> "
     :global.register_name(player_name, self)
     room_server_node = String.to_atom(get_line("room master's node >> "))
     Node.connect(room_server_node)
+    IO.inspect Node.list
     room_master_name = (get_line("room master's name >> "))
     send_player(room_master_name, {:join, Node.self, player_name, self})
     room_client_inner(player_name, :global.whereis_name room_master_name)

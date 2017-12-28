@@ -12,7 +12,22 @@ defmodule Monopoly.Util do
 
   def get_char(msg) do
     str = get_line(msg)
-    String.at(str, 0)
+    if (String.length str) != 1 do
+      IO.puts "please input 'a' character!"
+      get_char msg
+    else
+      String.at(str, 0)
+    end
+  end
+  def get_num(msg) do
+    num_str = get_line msg
+    try do
+      String.to_integer num_str
+    rescue
+      _ ->
+        IO.puts "please input a number!"
+        get_num(msg)
+    end
   end
 
   def find_taple(first_factor, taples_list) do

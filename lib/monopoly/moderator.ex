@@ -22,7 +22,6 @@ defmodule Monopoly.Moderator do
           if action_kind == :n do
             [h|t] = players_name_list
             new_players_name_list = t ++ [h]
-            IO.puts "[Debug] #{inspect new_players_name_list}"
             send_player(temp_player_name, {:next, new_players_name_list, self})
           else
             if player_name != temp_player_name do
